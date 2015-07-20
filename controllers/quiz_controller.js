@@ -13,12 +13,15 @@ exports.load = function(req, res, next, quizId) {
 };
 
 // GET /quizes
-exports.index = function(req, res) {
-    models.Quiz.findAll().then(
-        function(quizes) {
-            res.render('quizes/index', { quizes: quizes});
-        }
-    ).catch(function(error) { next(error);});
+exports.index = function(req, res){
+    var toSearch = req.query.search || "";
+    toSearch = toSearch.replace(/(^|\s|$)/g, "%");
+    models.Quiz.findAll({where: ["pregunta like ?", toSearch]}).then(
+        function(quizes){
+            res.render('quizes/index', {quizes: quizes});
+        }, function(error){
+            next(error);
+        });
 };
 
 // GET /quizes/:id
